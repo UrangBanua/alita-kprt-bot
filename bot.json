@@ -8,11 +8,12 @@
     "bot": [{
             "contains": [],
             "exact": ["/hai"],
-            "response": "Hai ada yg bisa saya bantu . . . ?"
+            "response": "Hai ada yg bisa saya bantu . . . ?",
+            "file":"help.png"
         },
 		{
 			"module": "HELP",
-            "contains": ["hai alita","/help","/about","/packmeal","/greencard","/observasi","/pto","/ss","/harrcon","/dfast","/dform","/dbest","/hrgaol","/ict","/gs"],
+            "contains": ["hai alita","/help","/about","/packmeal","/greencard","/observasi","/pto","/ss","/harrcon","/dfast","/dform","/dbest","/hrgaol","/ict","/gs","/fit_to_work","/p2h"],
             "exact": [],
             "response": "http://localhost:3000/bot_helps/",
             "type": "json",
@@ -20,7 +21,7 @@
         },
         {
 			"module": "LAPORAN",
-            "contains": ["db_sap","db_harrcon","db_roadmaintenance","db_hrgaol","db_ict","db_ss","db_dfast","db_dispatcher","db_flm-net1","db_flm-umpc"],
+            "contains": ["db_sap","db_harrcon","db_roadmaintenance","db_hrgaol","db_ict","db_ss","db_dfast","db_dispatcher","db_flm-net1","db_flm-umpc","db_fittowork","db_p2h"],
             "exact": [],
             "response": "http://localhost:3000/bot_api",
             "type": "json",

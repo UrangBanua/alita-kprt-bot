@@ -28,7 +28,76 @@ WAPI.waitNewMessages(false, (data) => {
     data.forEach((message) => {
 		message.labels = 'bot_api';
 		console.log(pretty(JSON.stringify(message)));
-		window.log(pretty(message));	
+		window.log(pretty(message));
+        /* fetch(intents.appconfig.webhook, {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body:    JSON.stringify(message),
+        }).then((resp) => resp.json()).then(data => (function (data) {
+            //response/data received from server
+            window.log(data);
+            WAPI.sendSeen(message.from._serialized);
+            //replying to the user based on data
+            WAPI.sendMessage2(message.from._serialized, data.response);
+            //sending files if there is any 
+            if (data.files.length > 0) {
+                data.files.forEach((file) => {
+                    WAPI.sendImage(file.file, data.From, file.name);
+                })
+            } 
+        }).catch(function (error) {
+            window.log(error);
+        }); */
+		
+		
+		/* function postData(data) {
+            //response/data received from server
+            console.log(data);
+            WAPI.sendSeen(message.from._serialized);
+            //replying to the user based on data
+            WAPI.sendMessage2(message.from._serialized, data.value[0].response);
+            //sending files if there is any 
+            if (data.value[0].file.length > 0) {
+                data.value[0].file.forEach((file) => {
+                    WAPI.sendImage(file.file, message.from._serialized, file.name);
+                })
+            } 
+        }).catch(function (error) {
+            console.log(error);
+        }); */
+		
+		/* var jMessage = {
+			id: message.id._serialized,
+			body: message.body,
+			type: message.type,
+			t: message.t,
+			notifyName: message.notifyName,
+			from: message.from,
+			to: message.to,
+			self: message.self,
+			ack: message.ack,
+			invis: message.invis,
+			isNewMsg: message.,
+			star: message.,
+			recvFresh: message.,
+			broadcast: message.,
+			mentionedJidList: '',
+			isForwarded: message.,
+			labels: message.,
+			sender: '',
+			timestamp: message.,
+			content: message.,
+			isGroupMsg: message.,
+			isMMS: message.,
+			isMedia: message.,
+			isNotification: message.,
+			isPSA: message.,
+			chat: '',
+			chatId: message.,
+			quotedMsgObj: '',
+			mediaData: ''
+		} */
+		
 		
 		
         //window.log(`Message from ${message.from.user} checking..`);
@@ -131,7 +200,6 @@ WAPI.waitNewMessages(false, (data) => {
 									window.log("Error Webhook ! :" + error);
 							  });	 
 				/////////////END POST///////////
-				
             } else if (PartialMatch != undefined && PartialMatch.mode == "get") {
 						message.content = 'get';
 						if (PartialMatch.module == 'HELP') {
@@ -179,33 +247,29 @@ WAPI.waitNewMessages(false, (data) => {
 										window.log("Error Webhook ! :" + error);
 								  });
 						}
-						
 			} else if (PartialMatch.module == 'GOMBAL') {
 					//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+PartialMatch.response+' 🤗');
 					window.log("GOMBAL message");
 					response = '👩🏻 '+PartialMatch.response+' 🤗';
 					//WAPI.ReplyMessageWithQuote(message.id, '👩🏻 '+PartialMatch.response+' 🤗');
-					
-					// respon message chat
-					window.log("response: " + response);			
-					WAPI.sendMessageToID(message.chatId, response);
-					
 			} else if (PartialMatch != undefined) {
 				
                 console.log("No partial match found");
             }
 			
-			window.log('');
-			window.log('-------------------------');
-			window.log(message.chatId);
+			// respon message chat
+			window.log("response: " + response);			
+            WAPI.sendMessage2(message.from._serialized, response);
 			
 			// read message chat
 			window.log("read message");
-			WAPI.sendSeen(message.chatId);
-			window.log("end read message");
+            WAPI.sendSeen(message.from._serialized);
+			console.log();
+			
+			console.log(message.id);
 			window.log('-------------------------');
 			window.log('');
-								
+					
 					if ((exactMatch || PartialMatch).file != undefined) {
 						window.getFile((exactMatch || PartialMatch).file).then((base64Data) => {
 							console.log(file);

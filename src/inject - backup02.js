@@ -25,10 +25,10 @@ function getTabs(n) {
 
 WAPI.waitNewMessages(false, (data) => {
     //window.log(data)
-    data.forEach((message) => {
+    async data.forEach((message) => {
 		message.labels = 'bot_api';
-		console.log(pretty(JSON.stringify(message)));
-		window.log(pretty(message));	
+		await console.log(pretty(JSON.stringify(message)));
+		await window.log(pretty(message));		
 		
 		
         //window.log(`Message from ${message.from.user} checking..`);
@@ -45,21 +45,21 @@ WAPI.waitNewMessages(false, (data) => {
                 return;
             }
 
-            var exactMatch = intents.bot.find(obj => obj.exact.find(ex => ex == message.body.toLowerCase()));
+            var exactMatch = await intents.bot.find(obj => obj.exact.find(ex => ex == message.body.toLowerCase()));
             var response = "";
             if (exactMatch != undefined) {
-                response = exactMatch.response;
+                //response = exactMatch.response;
                 window.log(`Replying with ${exactMatch.response}`);
             } else {
                 response = intents.noMatch;
                 console.log("No exact match found");
             }
-            var PartialMatch = intents.bot.find(obj => obj.contains.find(ex => message.body.toLowerCase().search(ex) > -1));
+            var PartialMatch = await intents.bot.find(obj => obj.contains.find(ex => message.body.toLowerCase().search(ex) > -1));
 			
 			if (PartialMatch == undefined && exactMatch == undefined && message.isGroupMsg == false) {
 			
 				/////////////POST dialogflow personal///////////////
-					fetch('http://localhost:3000/dialogflow/autobot-252413', {
+					await fetch('http://localhost:3000/dialogflow/autobot-252413', {
 						method: 'post',
 						body:    JSON.stringify(message),
 						headers: { 'Content-Type': 'application/json' }
@@ -69,10 +69,12 @@ WAPI.waitNewMessages(false, (data) => {
 										window.log('PersonalRespon: ' + res.dfRespon);
 										window.log('PersonalIntent: ' + res.dfIntent);
 										if (res.dfRespon != "") {
-											WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.dfRespon);
+											//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.dfRespon);
+											response = '👩🏻 '+res.dfRespon;
 											//WAPI.sendImage('foto', message.from._serialized, res.file);
 										} else {
-											WAPI.sendMessage2(message.from._serialized, '👩🏻 Maaf, belum bisa saya respon untuk hal ini. hasil analisa saya pertanyaan anda berhubungan degan ['+res.dfIntent+']');
+											//WAPI.sendMessage2(message.from._serialized, '👩🏻 hasil analisa dialog terkait ['+res.dfIntent+'], belum bisa saya respon untuk hal ini');
+											response = '👩🏻 hasil analisa dialog terkait ['+res.dfIntent+'], belum bisa saya respon untuk hal ini';
 										}
 																			
 								  }).catch((error) => {
@@ -83,7 +85,7 @@ WAPI.waitNewMessages(false, (data) => {
 			} else if (PartialMatch == undefined && exactMatch == undefined && message.isGroupMsg == true) {
 			
 				/////////////POST dialogflow group///////////////
-					fetch('http://localhost:3000/dialogflow/autobot-252413', {
+					await fetch('http://localhost:3000/dialogflow/autobot-252413', {
 						method: 'post',
 						body:    JSON.stringify(message),
 						headers: { 'Content-Type': 'application/json' }
@@ -106,7 +108,7 @@ WAPI.waitNewMessages(false, (data) => {
 				message.content = 'post';
 						window.log('Module: '+PartialMatch.module+', Mode:'+PartialMatch.mode+', Command:'+message.body.toLowerCase());
 				/////////////POST///////////////
-				fetch(PartialMatch.response, {
+				await fetch(PartialMatch.response, {
 					method: 'post',
 					body:    JSON.stringify(message),
 					headers: { 'Content-Type': 'application/json' }
@@ -115,7 +117,8 @@ WAPI.waitNewMessages(false, (data) => {
 				.then(res => {
 									//WAPI.sendSeen(message.from._serialized);
 									window.log(res.response);
-									WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.response);
+									//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.response);
+									response = '👩🏻 '+res.response;
 									//WAPI.sendImage('foto', message.from._serialized, res.file);
 									
 									if ((res.file != undefined)) {
@@ -131,17 +134,17 @@ WAPI.waitNewMessages(false, (data) => {
 									window.log("Error Webhook ! :" + error);
 							  });	 
 				/////////////END POST///////////
-				
             } else if (PartialMatch != undefined && PartialMatch.mode == "get") {
 						message.content = 'get';
 						if (PartialMatch.module == 'HELP') {
 						window.log('Module: '+PartialMatch.module+', Mode:'+PartialMatch.mode+', Command:'+message.body.toLowerCase());
-						fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
+						await fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
 						.then(res => res.json())
 						.then(res => {
 										//WAPI.sendSeen(message.from._serialized);
 										console.log(res);
-										WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.commands);
+										//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.commands);
+										response = '👩🏻 '+res.data.commands;
 										//WAPI.sendImage('foto', message.from._serialized, res.file);
 										
 										if ((res.data.file != undefined)) {
@@ -158,12 +161,13 @@ WAPI.waitNewMessages(false, (data) => {
 								  });
 						} else {
 						window.log('Module: '+PartialMatch.module+', Mode:'+PartialMatch.mode+', Command:'+message.body.toLowerCase());
-						fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
+						await fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
 						.then(res => res.json())
 						.then(res => {
 										//WAPI.sendSeen(message.from._serialized);
 										console.log(res);
-										WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.result);
+										//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.result);
+										response = '👩🏻 '+res.data.result;
 										//WAPI.sendImage('foto', message.from._serialized, res.file);
 										
 										if ((res.data.file != undefined)) {
@@ -179,33 +183,30 @@ WAPI.waitNewMessages(false, (data) => {
 										window.log("Error Webhook ! :" + error);
 								  });
 						}
-						
 			} else if (PartialMatch.module == 'GOMBAL') {
 					//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+PartialMatch.response+' 🤗');
 					window.log("GOMBAL message");
 					response = '👩🏻 '+PartialMatch.response+' 🤗';
 					//WAPI.ReplyMessageWithQuote(message.id, '👩🏻 '+PartialMatch.response+' 🤗');
-					
-					// respon message chat
-					window.log("response: " + response);			
-					WAPI.sendMessageToID(message.chatId, response);
-					
 			} else if (PartialMatch != undefined) {
 				
                 console.log("No partial match found");
             }
 			
-			window.log('');
-			window.log('-------------------------');
-			window.log(message.chatId);
-			
 			// read message chat
 			window.log("read message");
-			WAPI.sendSeen(message.chatId);
-			window.log("end read message");
+            await WAPI.sendSeen(message.from._serialized);
+			
+			// respon message chat
+			window.log("response: " + response);			
+            await WAPI.sendMessage2(message.from._serialized, response);
+			
+			console.log();
+			
+			console.log(message.id);
 			window.log('-------------------------');
 			window.log('');
-								
+					
 					if ((exactMatch || PartialMatch).file != undefined) {
 						window.getFile((exactMatch || PartialMatch).file).then((base64Data) => {
 							console.log(file);

@@ -1,13 +1,20 @@
 /**
+ * WAPI.js is taken from https://github.com/mukulhase/WebWhatsapp-Wrapper/blob/master/webwhatsapi/js/wapi.js
+ * A Python library which is worth checking out.
+ * The new WAPI is made from https://github.com/Theblood/Wapi_NEW/blob/master/wapi.js
+ */
+/* eslint-disable */
+/**
  * This script contains WAPI functions that need to be run in the context of the webpage
- * MrTheblood.
+ */
+/**
+ * This script contains WAPI functions that need to be run in the context of the webpage
  */
 
 /**
  * Auto discovery the webpack object references of instances that contains all functions used by the WAPI
  * functions and creates the Store object.
  */
-
 if (!window.Store) {
     (function () {
         function getStore(modules) {
@@ -60,7 +67,7 @@ if (!window.Store) {
                                 window.Store[needObj.id] = needObj.foundedModule;
                             }
                         });
-                         window.Store.sendMessage = function (e) {
+                        window.Store.sendMessage = function (e) {
                             return window.Store.SendTextMsgToChat(this, ...arguments);
                         }
                         return window.Store;
@@ -69,25 +76,7 @@ if (!window.Store) {
             }
         }
 
-        //webpackJsonp([], { 'parasite': (x, y, z) => getStore(z) }, ['parasite']);
-        /*
-        Code update thanks to
-        topkek,bobaoapae, TinsWeb, KopeK, Bruno, Bento
-        compatibility for old versions thanks felippeefreire
-        */
-        if (typeof webpackJsonp === 'function') {
-        webpackJsonp([], {'parasite': (x, y, z) => getStore(z)}, ['parasite']);
-            } else {
-                webpackJsonp.push([
-                    ['parasite'],
-                    {
-                        parasite: function (o, e, t) {
-                            getStore(t);
-                        }
-                    },
-                    [['parasite']]
-                ]);
-            }
+        webpackJsonp([], { 'parasite': (x, y, z) => getStore(z) }, ['parasite']);
     })();
 }
 
@@ -288,11 +277,10 @@ window.WAPI.getAllChatIds = function (done) {
  * @returns {Array|*} List of chats
  */
 window.WAPI.getAllGroups = function (done) {
-    var lil = window.Store.Chat.filter((chat) => chat.isGroup);
-    const t = lil.map((lil) => [lil.name,lil.id._serialized].join(";") || chat.name);
+    const groups = window.Store.Chat.filter((chat) => chat.isGroup);
 
-    if (done !== undefined) done(t);
-    return t;
+    if (done !== undefined) done(groups);
+    return groups;
 };
 
 /**
@@ -305,8 +293,7 @@ window.WAPI.getAllGroups = function (done) {
 window.WAPI.getChat = function (id, done) {
     id = typeof id == "string" ? id : id._serialized;
     const found = window.Store.Chat.get(id);
-        if (found)
-        found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
+    found.sendMessage = (found.sendMessage) ? found.sendMessage : function () { return window.Store.sendMessage.apply(this, arguments); };
     if (done !== undefined) done(found);
     return found;
 }
@@ -508,18 +495,6 @@ window.WAPI.areAllMessagesLoaded = function (id, done) {
  * @returns None
  */
 
-// window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
-//     const found = WAPI.getChat(id);
-//     x = function () {
-//         if (found.msgs.models[0].t > lastMessage) {
-//             found.loadEarlierMsgs().then(x);
-//         } else {
-//             done();
-//         }
-//     };
-//     x();
-// 
-
 window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
     const found = WAPI.getChat(id);
     x = function () {
@@ -531,6 +506,7 @@ window.WAPI.loadEarlierMessagesTillDate = function (id, lastMessage, done) {
     };
     x();
 };
+
 
 /**
  * Fetches all group metadata objects from store
@@ -623,6 +599,14 @@ window.WAPI.isLoggedIn = function (done) {
     return isLogged;
 };
 
+window.WAPI.isConnected = function (done) {
+    // Phone Disconnected icon appears when phone is disconnected from the tnternet
+    const isConnected = document.querySelector('*[data-icon="alert-phone"]') !== null ? false : true;
+
+    if (done !== undefined) done(isConnected);
+    return isConnected;
+};
+
 window.WAPI.processMessageObj = function (messageObj, includeMe, includeNotifications) {
     if (messageObj.isNotification) {
         if (includeNotifications)
@@ -695,19 +679,12 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
         if (done !== undefined) done(false);
         return false;
     }
-    messageObject = messageObject.valueOf();
-
-    let params = {
-        linkPreview : null, 
-        mentionedJidList : null, 
-        quotedMsg : messageObject, 
-        quotedMsgAdminGroupJid : null
-    };
+    messageObject = messageObject.value();
 
     const chat = WAPI.getChat(messageObject.chat.id)
     if (chat !== undefined) {
         if (done !== undefined) {
-            chat.sendMessage(message, params, messageObject).then(function () {
+            chat.sendMessage(message, null, messageObject).then(function () {
                 function sleep(ms) {
                     return new Promise(resolve => setTimeout(resolve, ms));
                 }
@@ -736,7 +713,7 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
             });
             return true;
         } else {
-            chat.sendMessage(message, params, messageObject);
+            chat.sendMessage(message, null, messageObject);
             return true;
         }
     } else {
@@ -744,7 +721,6 @@ window.WAPI.ReplyMessage = function (idMessage, message, done) {
         return false;
     }
 };
-
 
 window.WAPI.sendMessageToID = function (id, message, done) {
     try {

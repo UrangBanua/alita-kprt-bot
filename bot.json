@@ -17,7 +17,8 @@
             "exact": [],
             "response": "http://localhost:3000/bot_helps/",
             "type": "json",
-			"mode": "get"
+			"mode": "get",
+            "file":"help.png"
         },
         {
 			"module": "LAPORAN",
@@ -25,7 +26,8 @@
             "exact": [],
             "response": "http://localhost:3000/bot_api",
             "type": "json",
-			"mode": "post"
+			"mode": "post",
+            "file":"help.png"
         },
         {
 			"module": "LAPORAN GS",
@@ -33,7 +35,8 @@
             "exact": [],
             "response": "http://localhost:3000/bot_api",
             "type": "json",
-			"mode": "post"
+			"mode": "post",
+            "file":"help.png"
         },
         {
 			"module": "PACKMEAL",
@@ -41,19 +44,21 @@
             "exact": [],
             "response": "http://localhost:3000/bot_packmeal/",
             "type": "json",
-			"mode": "get"
+			"mode": "get",
+            "file":"help.png"
         },
         {
 			"module": "GOMBAL",
             "contains": ["alita sayang","alita cantik","hai sayang","hai cantik","gombalin aku dong"],
             "exact": [],
-            "response": "emmm, jangan gombal ya . . ."
+            "response": "emmm, jangan gombal ya . . .",
+            "file":"help.png"
         }
     ],
     "blocked": [],
     "noMatch":"",
     "smartreply":{
-        "suggestions":["👍","Okay","Terimakasih"],
+        "suggestions":[],
         "clicktosend":true
     }
 }

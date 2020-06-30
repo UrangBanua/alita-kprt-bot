@@ -1,7 +1,7 @@
 {
-  "name": "wbot",
-  "version": "0.9.0",
-  "description": "A simple whatsapp reply bot using puppeteer.",
+  "name": "ALITA-KPRT",
+  "version": "0.12.8",
+  "description": "ALITA-KPRT whatsapp reply bot using puppeteer & dialogflow.",
   "main": "src/index.js",
   "scripts": {
     "app": "node src/index.js",
@@ -10,7 +10,7 @@
   "bin": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vasani-arpit/WBOT"
+    "url": "git+https://github.com/afni18/alita-kprt-bot"
   },
   "keywords": [
     "whatsapp",
@@ -21,19 +21,20 @@
   "pkg": {
     "scripts": "src/**/*.js",
     "targets": [
-      "win",
-      "linux",
-      "macos"
+      "node10-win",
+      "node10-linux",
+      "node10-macos"
     ]
   },
-  "author": "Arpit Vasani",
+  "author": "Afni Afdillah",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/vasani-arpit/WBOT/issues"
+    "url": "https://github.com/afni18/alita-kprt-bot/issues"
   },
-  "homepage": "https://github.com/vasani-arpit/WBOT#readme",
+  "homepage": "https://github.com/afni18/alita-kprt-bot#readme",
   "dependencies": {
     "cli-progress": "^2.1.1",
+    "mel-spintax": "^1.0.4",
     "mime": "^2.4.4",
     "node-fetch": "^2.3.0",
     "ora": "^3.0.0",

@@ -23,29 +23,63 @@ function getTabs(n) {
   return res;
 }
 
-WAPI.waitNewMessages(false, (data) => {
-    //window.log(data)
-    data.forEach((message) => {
+WAPI.waitNewMessages(false, async (data) => {
+    for (let i = 0; i < data.length; i++) {		
+        //fetch API to send and receive response from server
+        let message = data[i];
+        body = {};
+        body.text = message.body;
+        body.type = 'message';
+        body.user = message.chatId._serialized;
+		
 		message.labels = 'bot_api';
 		console.log(pretty(JSON.stringify(message)));
-		window.log(pretty(message));	
+		window.log(pretty(message));
 		
+        //body.original = message;
 		
-        //window.log(`Message from ${message.from.user} checking..`);
+        /* if (intents.appconfig.webhook) {
+            fetch(intents.appconfig.webhook, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((resp) => resp.json()).then(function (response) {
+                //response received from server
+                console.log(response);
+                WAPI.sendSeen(message.chatId._serialized);
+                //replying to the user based on response
+                if (response && response.length > 0) {
+                    response.forEach(itemResponse => {
+                        WAPI.sendMessage2(message.chatId._serialized, itemResponse.text);
+                        //sending files if there is any 
+                        if (itemResponse.files && itemResponse.files.length > 0) {
+                            itemResponse.files.forEach((itemFile) => {
+                                WAPI.sendImage(itemFile.file, message.chatId._serialized, itemFile.name);
+                            })
+                        }
+                    });
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+        } */
+		
+        //window.log(`Message from ${message.chatId.user} checking..`);
         window.log(`Message from ${message.sender.pushname} checking..`);
-        if (intents.blocked.indexOf(message.from.user) >= 0) {
+        if (intents.blocked.indexOf(message.chatId.user) >= 0) {
             window.log("number is blocked by BOT. no reply");
             return;
         }
         if (message.type == "chat") {
-						
             //message.isGroupMsg to check if this is a group
             if (message.isGroupMsg == true && intents.appconfig.isGroupReply == false) {
                 window.log("Message received in group and group reply is off. so will not take any actions.");
                 return;
             }
-
-            var exactMatch = intents.bot.find(obj => obj.exact.find(ex => ex == message.body.toLowerCase()));
+            
+			var exactMatch = intents.bot.find(obj => obj.exact.find(ex => ex == message.body.toLowerCase()));
             var response = "";
             if (exactMatch != undefined) {
                 response = exactMatch.response;
@@ -69,10 +103,11 @@ WAPI.waitNewMessages(false, (data) => {
 										window.log('PersonalRespon: ' + res.dfRespon);
 										window.log('PersonalIntent: ' + res.dfIntent);
 										if (res.dfRespon != "") {
-											WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.dfRespon);
-											//WAPI.sendImage('foto', message.from._serialized, res.file);
+											//WAPI.sendMessageToID(message.chatId, '👩🏻 '+res.dfRespon);
+											WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+res.dfRespon);
+											//WAPI.sendImage('foto', message.chatId._serialized, res.file);
 										} else {
-											WAPI.sendMessage2(message.from._serialized, '👩🏻 Maaf, belum bisa saya respon untuk hal ini. hasil analisa saya pertanyaan anda berhubungan degan ['+res.dfIntent+']');
+											WAPI.sendMessage2(message.chatId._serialized, '👩🏻 Maaf, belum bisa saya respon untuk hal ini. hasil analisa saya pertanyaan anda berhubungan degan ['+res.dfIntent+']');
 										}
 																			
 								  }).catch((error) => {
@@ -92,8 +127,8 @@ WAPI.waitNewMessages(false, (data) => {
 					.then(res => {
 										window.log('GroupRespon: ' + res.dfRespon);
 										window.log('GroupIntent: ' + res.dfIntent);
-										//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.response);
-										//WAPI.sendImage('foto', message.from._serialized, res.file);
+										//WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+res.response);
+										//WAPI.sendImage('foto', message.chatId._serialized, res.file);
 																			
 								  }).catch((error) => {
 										window.log("Error Webhook DF Group ! :" + error);
@@ -113,15 +148,15 @@ WAPI.waitNewMessages(false, (data) => {
 				})
 				.then(res => res.json())
 				.then(res => {
-									//WAPI.sendSeen(message.from._serialized);
+									//WAPI.sendSeen(message.chatId._serialized);
 									window.log(res.response);
-									WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.response);
-									//WAPI.sendImage('foto', message.from._serialized, res.file);
+									WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+res.response);
+									//WAPI.sendImage('foto', message.chatId._serialized, res.file);
 									
 									if ((res.file != undefined)) {
 										window.getFile(res.file).then(base64Data => {
 											//console.log(file);
-											WAPI.sendImage(base64Data, message.from._serialized, res.file);
+											WAPI.sendImage(base64Data, message.chatId._serialized, res.file);
 										}).catch((error) => {
 											window.log("Error in sending file\n" + error);
 										})
@@ -139,15 +174,15 @@ WAPI.waitNewMessages(false, (data) => {
 						fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
 						.then(res => res.json())
 						.then(res => {
-										//WAPI.sendSeen(message.from._serialized);
+										//WAPI.sendSeen(message.chatId._serialized);
 										console.log(res);
-										WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.commands);
-										//WAPI.sendImage('foto', message.from._serialized, res.file);
+										WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+res.data.commands);
+										//WAPI.sendImage('foto', message.chatId._serialized, res.file);
 										
 										if ((res.data.file != undefined)) {
 											window.getFile(res.file).then(base64Data => {
 												//console.log(file);
-												WAPI.sendImage(base64Data, message.from._serialized, res.data.file);
+												WAPI.sendImage(base64Data, message.chatId._serialized, res.data.file);
 											}).catch((error) => {
 												window.log("Error in sending file\n" + error);
 											})
@@ -161,15 +196,15 @@ WAPI.waitNewMessages(false, (data) => {
 						fetch(PartialMatch.response + message.body.toLowerCase().replace('/',''))
 						.then(res => res.json())
 						.then(res => {
-										//WAPI.sendSeen(message.from._serialized);
+										//WAPI.sendSeen(message.chatId._serialized);
 										console.log(res);
-										WAPI.sendMessage2(message.from._serialized, '👩🏻 '+res.data.result);
-										//WAPI.sendImage('foto', message.from._serialized, res.file);
+										WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+res.data.result);
+										//WAPI.sendImage('foto', message.chatId._serialized, res.file);
 										
 										if ((res.data.file != undefined)) {
 											window.getFile(res.file).then(base64Data => {
 												//console.log(file);
-												WAPI.sendImage(base64Data, message.from._serialized, res.data.file);
+												WAPI.sendImage(base64Data, message.chatId._serialized, res.data.file);
 											}).catch((error) => {
 												window.log("Error in sending file\n" + error);
 											})
@@ -181,7 +216,7 @@ WAPI.waitNewMessages(false, (data) => {
 						}
 						
 			} else if (PartialMatch.module == 'GOMBAL') {
-					//WAPI.sendMessage2(message.from._serialized, '👩🏻 '+PartialMatch.response+' 🤗');
+					//WAPI.sendMessage2(message.chatId._serialized, '👩🏻 '+PartialMatch.response+' 🤗');
 					window.log("GOMBAL message");
 					response = '👩🏻 '+PartialMatch.response+' 🤗';
 					//WAPI.ReplyMessageWithQuote(message.id, '👩🏻 '+PartialMatch.response+' 🤗');
@@ -209,17 +244,15 @@ WAPI.waitNewMessages(false, (data) => {
 					if ((exactMatch || PartialMatch).file != undefined) {
 						window.getFile((exactMatch || PartialMatch).file).then((base64Data) => {
 							console.log(file);
-							WAPI.sendImage(base64Data, message.from._serialized, (exactMatch || PartialMatch).file);
+							WAPI.sendImage(base64Data, message.chatId._serialized, (exactMatch || PartialMatch).file);
 						}).catch((error) => {
 							window.log("Error in sending file\n" + error);
 						})
 					}
-			
-        } 	
-		
-    });
+					
+        }
+    }
 });
-
 WAPI.addOptions = function () {
     var suggestions = "";
     intents.smartreply.suggestions.map((item) => {

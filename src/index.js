@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer-core');
 const _cliProgress = require('cli-progress');
+const spintax = require('mel-spintax');
 require("./welcome");
 var spinner = require("./step");
 var utils = require("./utils");
@@ -24,7 +25,7 @@ async function Main() {
         if (!isLogin) {
             await getAndShowQR();
         }
-        if (configs.smartreply.suggestions.length >= 0) {
+        if (configs.smartreply.suggestions.length > 0) {
             await setupSmartReply();
         }
         console.log("WBOT is ready !! Let those message come.");
@@ -37,7 +38,7 @@ async function Main() {
         }
         console.warn(e);
         console.error("Don't worry errors are good. They help us improve. A screenshot has already been saved as error.png in current directory. Please mail it on vasani.arpit@gmail.com along with the steps to reproduce it.\n");
-		throw e;
+        throw e;
     }
 
     /**
@@ -106,6 +107,7 @@ async function Main() {
                 console.log(message);
             })
             page.exposeFunction("getFile", utils.getFileInBase64);
+            page.exposeFunction("resolveSpintax", spintax.unspin);
         }
     }
 
@@ -165,7 +167,7 @@ async function Main() {
 
     async function setupSmartReply() {
         spinner.start("setting up smart reply");
-        await page.waitForSelector(".app");
+        await page.waitForSelector("#app");
         await page.evaluate(`
             var observer = new MutationObserver((mutations) => {
                 for (var mutation of mutations) {
@@ -173,7 +175,7 @@ async function Main() {
                     if (mutation.addedNodes.length && mutation.addedNodes[0].id === 'main') {
                         //newChat(mutation.addedNodes[0].querySelector('.copyable-text span').innerText);
                         console.log("%cChat changed !!", "font-size:x-large");
-                        //WAPI.addOptions();
+                        WAPI.addOptions();
                     }
                 }
             });

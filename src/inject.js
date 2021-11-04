@@ -241,14 +241,14 @@ WAPI.waitNewMessages(false, async (data) => {
 			window.log('-------------------------');
 			window.log('');
 								
-					if ((exactMatch || PartialMatch).file != undefined) {
+					/* if ((exactMatch || PartialMatch).file != undefined) {
 						window.getFile((exactMatch || PartialMatch).file).then((base64Data) => {
 							console.log(file);
 							WAPI.sendImage(base64Data, message.chatId._serialized, (exactMatch || PartialMatch).file);
 						}).catch((error) => {
 							window.log("Error in sending file\n" + error);
 						})
-					}
+					} */
 					
         }
     }
